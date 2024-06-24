@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Greedy Pack ~ Alkane</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .input-section, .result-section {
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        input {
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Greedy Pack ~ Alkane</h1>
+    <div class="input-section">
+        <div class="input-group">
+            <label for="numItems">Number of Items:</label>
+            <input type="number" id="numItems" min="1">
+        </div>
+        <div id="itemsInputs"></div>
+        <div class="input-group">
+            <label for="capacity">Pack Capacity:</label>
+            <input type="number" id="capacity" min="1">
+        </div>
+        <button onclick="solvePack()">Solve Greedy Pack </button>
+    </div>
+    <div class="result-section">
+        <h2>Results</h2>
+        <p id="totalValue"></p>
+        <p id="totalWeight"></p>
+        <h3>Included Items</h3>
+        <ul id="includedItems"></ul>
+    </div>
+
+    <script>
+        // اضافه کردن رویداد برای تغییر تعداد آیتم‌ها
+        document.getElementById('numItems').addEventListener('change', function() {
+            const numItems = parseInt(this.value); // دریافت تعداد آیتم‌ها از ورودی
+            const itemsInputs = document.getElementById('itemsInputs'); // دریافت بخش ورودی آیتم‌ها
+            itemsInputs.innerHTML = ''; // پاک کردن محتوای قبلی
+            for (let i = 0; i < numItems; i++) { // اضافه کردن ورودی برای هر آیتم
+                const itemDiv = document.createElement('div'); // ایجاد یک div برای آیتم
+                itemDiv.classList.add('input-group'); // اضافه کردن کلاس CSS به div
+                itemDiv.innerHTML = `
+                    <label>Value of item ${i + 1}:</label>
+                    <input type="number" class="item-value" min="1">
+                    <label>Weight of item ${i + 1}:</label>
+                    <input type="number" class="item-weight" min="1">
+                `;
+                itemsInputs.appendChild(itemDiv); // اضافه کردن div به بخش ورودی آیتم‌ها
+            }
+        });
+
+        // تابع برای حل مسئله کوله‌پشتی به روش حریصانه
+        function packGreedy(values, weights, capacity) {
+            // ایجاد آرایه‌ای از اشیاء که شامل ارزش، وزن و نسبت ارزش به وزن هر آیتم باشد
+            let items = values.map((value, index) => ({
+                value,
+                weight: weights[index],
+                ratio: value / weights[index] //نسبت
+            }));
+
+            // مرتب‌سازی آیتم‌ها بر اساس نسبت ارزش به وزن به صورت نزولی
+            items.sort((a, b) => b.ratio - a.ratio);
+
+            let totalValue = 0; // مقدار کل ارزش آیتم‌های انتخاب شده
+            let totalWeight = 0; // مقدار کل وزن آیتم‌های انتخاب شده
+            let includedItems = []; // لیست آیتم‌های انتخاب شده
+
+            // افزودن آیتم‌ها به کوله‌پشتی به ترتیب تا زمانی که ظرفیت اجازه دهد
+            for (let item of items) {
+                if (totalWeight + item.weight <= capacity) { // اگر افزودن این آیتم به کوله‌پشتی امکان‌پذیر باشد
+                    includedItems.push(item); // افزودن آیتم به لیست آیتم‌های انتخاب شده
+                    totalValue += item.value; // افزودن ارزش آیتم به مقدار کل ارزش
+                    totalWeight += item.weight; // افزودن وزن آیتم به مقدار کل وزن
+                }
+            }
+
+            // برگرداندن نتیجه شامل مقدار کل ارزش و وزن آیتم‌های انتخاب شده و لیست آیتم‌های انتخاب شده
+            return {
+                totalValue,
+                totalWeight,
+                includedItems
+            };
+        }
+
+        // تابع برای جمع‌آوری ورودی‌ها و حل مسئله کوله‌پشتی
+        function solvePack() {
+            // جمع‌آوری ارزش‌ها و وزن‌های آیتم‌ها از ورودی‌ها
+            const values = Array.from(document.getElementsByClassName('item-value')).map(input => parseInt(input.value));
+            const weights = Array.from(document.getElementsByClassName('item-weight')).map(input => parseInt(input.value));
+            const capacity = parseInt(document.getElementById('capacity').value); // دریافت ظرفیت کوله‌پشتی
+
+            // محاسبه نتیجه با استفاده از تابع packGreedy
+            const result = packGreedy(values, weights, capacity);
+
+            // نمایش نتیجه در بخش نمایش نتیجه
+            document.getElementById('totalValue').innerText = `Total Value: ${result.totalValue}`;
+            document.getElementById('totalWeight').innerText = `Total Weight: ${result.totalWeight}`;
+            const includedItemsList = document.getElementById('includedItems');
+            includedItemsList.innerHTML = '';
+            result.includedItems.forEach((item, index) => { // نمایش آیتم‌های انتخاب شده
+                const li = document.createElement('li');
+                li.innerText = `Item ${index + 1} - Value: ${item.value}, Weight: ${item.weight}`;
+                includedItemsList.appendChild(li);
+            });
+
+            document.querySelector('.result-section').style.display = 'block'; // نمایش بخش نتیجه
+        }
+    </script>
+</body>
+</html>
