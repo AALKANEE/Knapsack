@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backtracking</title>
+    <style>
+      .input-group {
+        margin-bottom: 10px;
+      }
+      .result-section {
+        display: none;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>0/1 knapsack Backtrack ~ ALKANE</h1>
+    <div>
+      <label for="numItems">Number of items: </label>
+      <input type="number" id="numItems" min="1" max="10" />
+    </div>
+    <div id="itemsInputs"></div>
+    <div>
+      <label for="capacity">Capacity of knapsack: </label>
+      <input type="number" id="capacity" min="1" />
+    </div>
+    <button id="solveButton">Solve</button>
+    <div class="result-section">
+      <h2>Results</h2>
+      <p id="totalValue"></p>
+      <p id="totalWeight"></p>
+      <ul id="includedItems"></ul>
+      <canvas id="knapsackCanvas" width="600" height="400"></canvas>
+    </div>
+  </body>
+  <script src="Knapsack.js"></script>
+</html>
